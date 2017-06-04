@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 from sqlalchemy import create_engine
 
 def get_stks_guba(headers):
-    """
+    """获取股吧信息表
 
     :param headers:
     :return:
@@ -19,6 +19,7 @@ def get_stks_guba(headers):
     tag_a_lst = stk_block.find_all('a')
 
     stk_cd_lst = [];stk_name_lst = [];stk_gb_url_lst = []
+
     for i,tag_a in enumerate(tag_a_lst):
         try:
             stk_cd,stk_name = tag_a.get_text().split(")")
@@ -26,11 +27,11 @@ def get_stks_guba(headers):
         except Exception as e:
             print(tag_a.get_text(),e)
         else:
-            if re.match('^600|000|002|300',stk_cd):
+            if re.match('^600|000|002|300',stk_cd) and stk_cd not in stk_cd_lst:
                 stk_cd_lst.append(stk_cd)
                 stk_name_lst.append(stk_name)
                 stk_gb_url_lst.append('http://guba.eastmoney.com/list,%s.html' % stk_cd)
-        # if i>10:break
+
     gb_df = pd.DataFrame(data=np.transpose([stk_cd_lst,stk_name_lst,stk_gb_url_lst]),
                          columns=['stk_cd','stk_name','stk_gb_url'])
 
@@ -52,3 +53,5 @@ if __name__ == '__main__':
 
 
     gb_df = get_stks_guba(headers)
+    # gb_df.to_sql('em_Guba')
+    print(gb_df.head())
