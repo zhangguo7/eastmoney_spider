@@ -1,5 +1,7 @@
 # -*- coding:utf-8 -*-
 import re
+
+from datetime import datetime
 import numpy as np
 import pandas as pd
 import requests
@@ -35,7 +37,18 @@ def get_stks_guba(headers):
     gb_df = pd.DataFrame(data=np.transpose([stk_cd_lst,stk_name_lst,stk_gb_url_lst]),
                          columns=['stk_cd','stk_name','stk_gb_url'])
 
+    gb_df['stk_update_time'] = datetime.now()
     return gb_df
+
+
+def save2gb(gb_df,emDB_engine):
+    """
+    
+    :param gb_df: 股吧数据框
+    :param emDB_engine: eastmoney 数据库引擎
+    """
+    gb_df.to_sql(name='stk_guba_url',con=emDB_engine,if_exists='append',index=False)
+
 
 if __name__ == '__main__':
 
@@ -51,7 +64,7 @@ if __name__ == '__main__':
         'User-Agent':'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.76 Safari/537.36'
     }
 
+    emDB_engine = create_engine("sqlite:///eastmoney.db", echo=True)
 
     gb_df = get_stks_guba(headers)
-    # gb_df.to_sql('em_Guba')
-    print(gb_df.head())
+    save2gb(gb_df,emDB_engine)

@@ -1,15 +1,12 @@
 # -*- coding:utf-8 -*-
-from sqlalchemy.orm import sessionmaker
+
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, String, DateTime
-import datetime
+
 emDB_engine = create_engine("sqlite:///eastmoney.db", echo=True)
 
-# 生成一个基类
 Base = declarative_base()
-Session = sessionmaker(bind=emDB_engine)
-
 
 class StkGubaUrl(Base):
     """定义股吧表"""
@@ -25,15 +22,4 @@ class StkGubaUrl(Base):
         return "<stk_guba_url(code='%s',name='%s',url='%s')>"\
                % (self.stk_cd, self.stk_name, self.stk_gb_url)
 
-
-# stk1 = StkGubaUrl(
-#     stk_cd='600000',
-#     stk_name='浦发银行',
-#     stk_gb_url='http://guba.eastmoney.com/list,600000.html',
-#     stk_update_time=datetime.datetime.now()
-# )
-
-# Base.metadata.create_all(emDB_engine)
-# session = Session()
-# session.add(stk1)
-# session.commit()
+Base.metadata.create_all(emDB_engine)
